@@ -1,6 +1,6 @@
 import { Person } from "../types/person"
 
-export const initialPerson: Person = {
+export const initialPersonBio: Person = {
   id: 4,
   firstname: "Freda",
   surname: "Lowery",

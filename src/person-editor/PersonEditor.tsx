@@ -1,61 +1,91 @@
-import React, { ReactElement } from "react"
+import React, { ReactElement, useEffect, useState } from "react"
+import localforage from "localforage"
 
-import { LabeledInput } from "../components"
-import { initialPerson } from "../utils"
+import { LabeledInput, Loading } from "../components"
+import { initialPersonBio } from "../utils"
+import { Person } from "../types/person"
+
+function savePersonBio(personBio: Person | null): void {
+  console.log("..Saving..")
+  localforage.setItem("personBio", personBio)
+}
 
 export function PersonEditor(): ReactElement {
-  const person = initialPerson
+  const [personBio, setPersonBio] = useState<Person | null>(null)
 
+  useEffect(() => {
+    async function getPersonBio() {
+      const savedPersonBio = await localforage.getItem<Person>("personBio")
+      setPersonBio(savedPersonBio ?? initialPersonBio)
+    }
+
+    getPersonBio()
+  }, [])
+
+  useEffect(() => {
+    savePersonBio(personBio)
+  }, [personBio])
+
+  if (!personBio) {
+    return <Loading />
+  }
   return (
     <form
       className="person-editor"
       onSubmit={(e) => {
         e.preventDefault()
-        alert(`Submitting\n${JSON.stringify(person, null, 2)}`)
+        alert(`Submitting\n${JSON.stringify(personBio, null, 2)}`)
       }}
     >
-      <h2>Person Editor</h2>
+      <h2>Bio Editor</h2>
       <LabeledInput
         label="Firstname:"
-        value={person.firstname}
+        value={personBio.firstname}
         onChange={(e) => {
-          const newPerson = {
-            ...person,
+          setPersonBio((personBio) => ({
+            ...personBio!,
             firstname: e.target.value,
+          }))
+
+          if (e.target.value === "Ford") {
+            setPersonBio((personBio) => ({
+              ...personBio!,
+              surname: "Henry",
+              address: "Semarang",
+            }))
           }
-          console.log("Updated person:", newPerson)
         }}
       />
       <LabeledInput
         label="Surname:"
-        value={person.surname}
+        value={personBio.surname}
         onChange={(e) => {
-          const newPerson = { ...person, surname: e.target.value }
-          console.log("Updated person:", newPerson)
+          const newData = { ...personBio, surname: e.target.value }
+          setPersonBio(newData)
         }}
       />
       <LabeledInput
         label="Email:"
-        value={person.email}
+        value={personBio.email}
         onChange={(e) => {
-          const newPerson = { ...person, email: e.target.value }
-          console.log("Updated person:", newPerson)
+          const newData = { ...personBio, email: e.target.value }
+          setPersonBio(newData)
         }}
       />
       <LabeledInput
         label="Address:"
-        value={person.address}
+        value={personBio.address}
         onChange={(e) => {
-          const newPerson = { ...person, address: e.target.value }
-          console.log("Updated person:", newPerson)
+          const newData = { ...personBio, address: e.target.value }
+          setPersonBio(newData)
         }}
       />
       <LabeledInput
         label="Phone:"
-        value={person.phone}
+        value={personBio.phone}
         onChange={(e) => {
-          const newPerson = { ...person, phone: e.target.value }
-          console.log("Updated person:", newPerson)
+          const newData = { ...personBio, phone: e.target.value }
+          setPersonBio(newData)
         }}
       />
       <hr />
@@ -65,7 +95,7 @@ export function PersonEditor(): ReactElement {
         </button>
       </div>
       <hr />
-      <pre>{JSON.stringify(person, null, 2)}</pre>
+      <pre>{JSON.stringify(personBio, null, 2)}</pre>
     </form>
   )
 }

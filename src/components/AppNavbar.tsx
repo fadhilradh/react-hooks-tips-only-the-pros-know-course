@@ -8,9 +8,9 @@ export function AppNavbar(): ReactElement {
   const isCursive = style?.fontFamily == "cursive"
 
   return (
-    <Navbar bg="dark" variant="dark">
+    <Navbar bg="dark" variant="dark" style={{ padding: "5px 24px" }}>
       <Navbar.Brand as={Link} to="/">
-        React Hooks for pros
+        React Hooks for Pros
       </Navbar.Brand>
       <Nav className="me-auto">
         <Nav.Link as={NavLink} to="/person-editor">
