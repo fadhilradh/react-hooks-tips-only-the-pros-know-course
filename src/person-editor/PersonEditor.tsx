@@ -1,30 +1,17 @@
-import React, { ReactElement, useEffect, useState } from "react"
-import localforage from "localforage"
-
-import { LabeledInput, Loading } from "../components"
+import React, { ReactElement, useEffect, useRef } from "react"
 import { initialPersonBio } from "../utils"
-import { Person } from "../types/person"
-
-function savePersonBio(personBio: Person | null): void {
-  console.log("..Saving..")
-  localforage.setItem("personBio", personBio)
-}
+import { LabeledInput, Loading } from "../components"
+import { usePersonBio } from "../hooks/usePersonBio"
 
 export function PersonEditor(): ReactElement {
-  const [personBio, setPersonBio] = useState<Person | null>(null)
+  const [personBio, setPersonBio] = usePersonBio(initialPersonBio)
+  const input = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
-    async function getPersonBio() {
-      const savedPersonBio = await localforage.getItem<Person>("personBio")
-      setPersonBio(savedPersonBio ?? initialPersonBio)
-    }
-
-    getPersonBio()
+    setTimeout(() => {
+      input.current?.focus()
+    }, 1000)
   }, [])
-
-  useEffect(() => {
-    savePersonBio(personBio)
-  }, [personBio])
 
   if (!personBio) {
     return <Loading />
@@ -39,6 +26,7 @@ export function PersonEditor(): ReactElement {
     >
       <h2>Bio Editor</h2>
       <LabeledInput
+        ref={input}
         label="Firstname:"
         value={personBio.firstname}
         onChange={(e) => {
